@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.video.VideoConfigDao">
+
+   <!-- 视频参数配置 -->
+   <select id="getConfigKey" parameterType="java.lang.String" resultType="com.cms.model.video.VideoConfig">
+        select * from t_video_config where `keys` = #{keys}
+   </select>
+</mapper>

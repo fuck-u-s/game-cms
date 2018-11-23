@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.video.VideoCommentDao">
+
+    <!-- 视频评论 -->
+    <select id="commentList" parameterType="java.lang.Long" resultType="com.cms.model.video.VComment">
+        SELECT a.*,b.nickName,b.avatarUrl,
+        CASE WHEN a.reply_id > 0 THEN (SELECT nickName FROM t_app_user WHERE id = a.reply_id) ELSE '' END AS reply
+        FROM t_video_comment a
+        JOIN t_app_user b ON a.`user_id` = b.id
+        where a.v_id = #{vid}
+        order by a.id desc
+    </select>
+
+    <!-- 用户评论 -->
+    <insert id="videoReply" parameterType="com.cms.model.video.VComment" useGeneratedKeys="true" keyProperty="id">
+        insert into t_video_comment (v_id, user_id, content, reply_id)
+        values (#{v_id},#{user_id},#{content},#{reply_id})
+    </insert>
+
+    <!-- 评论点赞 -->
+    <insert id="replayClick" parameterType="java.util.Map">
+        insert into t_video_reply_top (v_id, comment_id, user_id,reply_id)
+        VALUES (#{v_id},#{comment_id},#{user_id},#{reply_id})
+    </insert>
+
+    <!-- 点赞数量 -->
+    <update id="addNum" parameterType="java.util.Map">
+        update t_video_comment set top = top + 1 where id = #{comment_id}
+    </update>
+
+    <!-- 视频点赞列表 -->
+    <select id="userTopList" parameterType="java.util.Map" resultType="com.cms.model.video.ReplyTop">
+        select * from t_video_reply_top where v_id = #{v_id} and user_id = #{user_id}
+    </select>
+
+    <!-- 删除评论 -->
+    <delete id="deleteReply" parameterType="java.lang.Long">
+        delete from t_video_comment where id = #{id}
+    </delete>
+
+    <!-- 我的评论 -->
+    <select id="replyList" parameterType="java.lang.Long" resultType="com.cms.model.video.VComment">
+        SELECT a.*,b.nickName,b.avatarUrl,c.title,
+        CASE WHEN a.reply_id > 0 THEN (SELECT nickName FROM t_app_user WHERE id = a.reply_id) ELSE '' END AS reply
+        FROM t_video_comment a
+        JOIN t_app_user b ON a.`user_id` = b.id
+        join t_video c on a.v_id = c.id
+        where a.user_id = #{user_id}
+        order by a.id desc
+    </select>
+</mapper>

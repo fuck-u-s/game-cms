@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.app.AppDao">
+
+    <!-- 小程序配置列表 -->
+    <select id="appList" parameterType="java.util.Map" resultType="com.cms.model.app.AppInfo">
+        SELECT * FROM t_app_info
+    </select>
+
+    <!-- 小程序配置信息 -->
+    <select id="appInfo" parameterType="java.lang.String" resultType="com.cms.model.app.AppInfo">
+        SELECT * FROM t_app_info WHERE app_id = #{appid}
+    </select>
+
+</mapper>

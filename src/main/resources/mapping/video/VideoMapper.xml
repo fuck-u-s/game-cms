@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.video.VideoDao">
+
+    <!-- 视频管理 -->
+    <select id="videoList" parameterType="java.util.Map" resultType="com.cms.model.video.Video">
+        SELECT a.id,a.title,a.cate,a.cover,a.issuer,a.url,a.vtime,a.hot,a.state,
+        CONVERT(a.hot/10000,DECIMAL(10,1)) AS ihot,b.`cover` AS avatar,b.`name`,c.`name` AS cateName
+        FROM t_video a
+        JOIN t_video_issuer b ON a.`issuer` = b.id
+        JOIN t_video_type c ON a.`cate` = c.id
+        WHERE 1=1
+        <if test="title != null and title!= ''">
+            and a.`title` like CONCAT('%',#{title},'%')
+        </if>
+        <if test="cate > 0">
+            and a.cate = #{cate}
+        </if>
+        <if test="state > 0">
+            and a.state = #{state}
+        </if>
+        order by a.id desc
+    </select>
+
+    <!-- 新增视频 -->
+    <insert id="setVideo" parameterType="com.cms.model.video.Video" useGeneratedKeys="true" keyProperty="id">
+        insert into t_video (title,cate,cover,url,hot,vtime,issuer,state)
+        values (#{title},#{cate},#{cover},#{url},#{hot},#{vtime},#{issuer},#{state})
+    </insert>
+
+    <!-- 视频信息 -->
+    <select id="videoInfo" parameterType="java.lang.Long" resultType="com.cms.model.video.Video">
+        select * from t_video where id = #{id}
+    </select>
+
+    <!-- 编辑视频 -->
+    <update id="updateVideo" parameterType="com.cms.model.video.Video">
+        update t_video set title = #{title},url = #{url},hot = #{hot},vtime = #{vtime},cate = #{cate},
+                           cover = #{cover},issuer = #{issuer}
+        where id = #{id}
+    </update>
+
+    <!-- 删除视频 -->
+    <update id="deleteVideo" parameterType="java.util.Map">
+        update t_video set state = #{state} where id = #{id}
+    </update>
+
+    <!-- 视频详情 -->
+    <select id="videoDetail" parameterType="java.lang.Integer" resultType="java.util.Map">
+        SELECT a.id,a.title,a.cate,a.cover,a.issuer,a.url,a.vtime,convert(a.hot/10000,decimal(10,1)) as ihot,
+               b.`cover` AS avatar,b.`name`
+        from t_video a
+        join t_video_issuer b on a.issuer = b.id
+        where a.id = #{id}
+    </select>
+
+    <!-- 发布者视频 -->
+    <select id="issuerVideoList" parameterType="java.util.Map" resultType="com.cms.model.video.Video">
+        SELECT a.id,a.title,a.cate,a.cover,a.issuer,a.url,a.vtime,
+               convert(a.hot/10000,decimal(10,1)) as ihot
+        from t_video a
+        where a.issuer = #{issuer}
+    </select>
+
+    <!-- 待解析视频 -->
+    <select id="transList" resultType="com.cms.model.video.Video">
+        select * from t_video where state = 2
+    </select>
+
+    <!-- 同步视频信息 -->
+    <update id="syncVideoInfo" parameterType="com.cms.model.video.Video">
+        update t_video set state = #{state},url = #{url} where id = #{id}
+    </update>
+
+    <!--*****************************快报视频处理 *************************************-->
+
+    <!-- 拉取快报视频 -->
+    <insert id="syncKuaiBaoList" parameterType="com.cms.model.video.KuaiBao">
+        insert into t_video_kuaibao(id, title, source, url, vid, `desc`, img, width, height,playurl,duration)
+        values (#{id}, #{title}, #{source}, #{url}, #{vid}, #{desc}, #{img}, #{width}, #{height}, #{playurl},#{duration})
+        on duplicate key update title = #{title},source = #{source},url = #{url},vid = #{vid},`desc` = #{desc},
+        img = #{img},width = #{width},height = #{height},playurl = #{playurl},duration = #{duration}
+    </insert>
+
+    <!-- 快报视频 -->
+    <select id="kuaiBaoList" parameterType="java.util.Map" resultType="com.cms.model.video.KuaiBao">
+        select *,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as dateTime from t_video_kuaibao where 1=1 and state = #{state}
+    </select>
+
+    <!-- 删除快报 -->
+    <delete id="deleteKuaiBao" parameterType="java.lang.String">
+        delete from t_video_kuaibao where id = #{id}
+    </delete>
+
+    <!-- 快报信息 -->
+    <select id="kuaiBaoInfo" parameterType="java.lang.String" resultType="com.cms.model.video.KuaiBao">
+        select * from t_video_kuaibao where id = #{id}
+    </select>
+
+    <!-- 回执快报处理状态 -->
+    <update id="resetKuaiBao" parameterType="java.util.Map">
+        update t_video_kuaibao set state = #{state} where id = #{id}
+    </update>
+
+    <!-- 待处理快报视频 -->
+    <select id="waiteKuaiBaoList" resultType="com.cms.model.video.KuaiBao">
+        select * from t_video_kuaibao where state = 1 and ispush = 1 limit 1
+    </select>
+
+    <!-- 记录下发 -->
+    <update id="setPush" parameterType="java.util.Map">
+        update t_video_kuaibao set ispush = #{ispush} where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.sys.DeptDao">
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.cms.model.sys.Dept" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO T_DEPT (name)VALUES (#{name})
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="java.util.Map">
+        DELETE FROM T_DEPT WHERE id = #{id}
+    </delete>
+
+    <!-- 修改 -->
+    <update id="update" parameterType="com.cms.model.sys.Dept">
+        update T_DEPT set name = #{name} where id = #{id}
+    </update>
+
+    <!-- 查看 -->
+    <select id="get" parameterType="java.util.Map" resultType="com.cms.model.sys.Dept">
+        SELECT * FROM T_DEPT where id = #{id}
+    </select>
+
+    <!-- 列表 -->
+    <select id="list" parameterType="java.lang.Long" resultType="com.cms.model.sys.Dept">
+        SELECT * FROM T_DEPT
+    </select>
+
+    <!-- 是否存在相同部门 -->
+    <select id="hasDept" parameterType="com.cms.model.sys.Dept" resultType="java.lang.Integer">
+        SELECT count(0) FROM T_DEPT where name = #{name}
+        <if test="#{id != null and id != 0}">
+            and id != #{id}
+        </if>
+    </select>
+
+    <!-- 部门下是否存在人员 -->
+    <select id="hasUser" resultType="java.lang.Integer">
+        SELECT count(0) FROM T_DEPT_USER WHERE DEPT_ID = #{id}
+    </select>
+</mapper>

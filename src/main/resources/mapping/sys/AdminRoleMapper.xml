@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.sys.AdminRoleDao">
+    <resultMap id="BaseResultMap" type="com.cms.model.sys.AdminRole">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_time" property="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 插入数据 -->
+    <insert id="insert" parameterType="com.cms.model.sys.AdminRole" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_admin_role (name,status,isauth)
+        VALUES (#{name},#{status},#{isAuth})
+    </insert>
+
+    <!-- 更新数据 -->
+    <update id="update" parameterType="com.cms.model.sys.AdminRole">
+        update t_admin_role
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 查询登录用户角色 -->
+    <select id="findRoleByUserId" parameterType="java.lang.Long" resultType="com.cms.model.sys.AdminRole">
+        SELECT b.* FROM t_admin_user_role a JOIN t_admin_role b on a.role_id=b.id
+        WHERE a.user_id = #{user_id}
+    </select>
+
+    <!-- 角色是否存在 -->
+    <select id="hasRole" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(0) FROM t_admin_role where name = #{name}
+    </select>
+
+    <!-- 角色列表 -->
+    <select id="roleCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(0) FROM t_admin_role where id != 1
+    </select>
+    <select id="roleList" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminRole">
+        SELECT a.*,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime
+        FROM t_admin_role a where id != 1
+    </select>
+
+    <!-- 所有角色 -->
+    <select id="allRoles" parameterType="java.lang.Long" resultType="com.cms.model.sys.AdminRole">
+        SELECT * from t_admin_role WHERE id != 1 and isauth = 2 and status = 1
+    </select>
+
+    <!-- 所有管理角色 -->
+    <select id="allAdminRoles" resultType="com.cms.model.sys.AdminRole">
+        SELECT * from t_admin_role WHERE id != 1 and status = 1 and isauth = 1
+    </select>
+
+    <!-- 删除用户所属角色 -->
+    <delete id="deleteUserRole" parameterType="java.lang.Long">
+        DELETE FROM t_admin_user_role WHERE 1=1 AND user_id = #{user_id}
+    </delete>
+
+    <!-- 删除角色所有用户 -->
+    <delete id="deleteRoleUser" parameterType="java.lang.Long">
+        DELETE FROM t_admin_user_role WHERE 1=1 AND user_id = #{role_id}
+    </delete>
+
+    <!-- 激活/关闭 -->
+    <update id="lock" parameterType="java.util.Map">
+        UPDATE t_admin_role SET status = #{status} where id = #{id}
+    </update>
+
+    <!-- 角色信息 -->
+    <select id="role" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminRole">
+        SELECT * FROM t_admin_role where id = #{id}
+    </select>
+
+    <!-- 删除角色 -->
+    <delete id="deleteRole" parameterType="java.util.Map">
+        DELETE FROM t_admin_role WHERE id = #{id}
+    </delete>
+
+    <!-- 角色是否使用 -->
+    <select id="useRole" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM t_admin_user_role WHERE role_id = #{role_id} and user_id = #{user_id}
+    </select>
+
+    <!-- 删除角色菜单 -->
+    <delete id="deleteRoleMenu" parameterType="java.lang.Long">
+        DELETE FROM t_admin_role_menu WHERE role_id = #{role_id}
+    </delete>
+
+    <!-- 角色菜单授权 -->
+    <insert id="roleMenuRoot" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_admin_role_menu(role_id,menu_id)VALUES (#{role_id},#{menu_id})
+    </insert>
+</mapper>

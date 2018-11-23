@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.video.VideoCateDao">
+
+    <!-- 视频类型管理 -->
+    <select id="cateList" parameterType="java.util.Map" resultType="java.util.Map">
+        select * from t_video_type where 1=1
+    </select>
+
+    <!-- 设置类型 -->
+    <insert id="setCate" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+        insert into t_video_type (`name`) values (#{name})
+    </insert>
+
+    <!-- 类型信息 -->
+    <select id="cateInfo" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select * from t_video_type where id = #{id}
+    </select>
+
+    <!-- 编辑类型 -->
+    <update id="updateCate" parameterType="java.util.Map">
+        update t_video_type set `name` = #{name} where id = #{id}
+    </update>
+
+    <!-- 删除类型 -->
+    <delete id="deleteCate" parameterType="java.lang.Integer">
+        delete from t_video_type where id = #{id}
+    </delete>
+</mapper>

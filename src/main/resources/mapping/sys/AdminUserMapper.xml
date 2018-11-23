@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.sys.AdminUserDao">
+    <resultMap id="BaseResultMap" type="com.cms.model.sys.AdminUser">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="salt" property="salt" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="dept_id" property="dept_id" jdbcType="BIGINT"/>
+        <result column="area" property="area" jdbcType="INTEGER"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="create_time" property="create_time" jdbcType="TIMESTAMP"/>
+        <result column="last_login_ip" property="last_login_ip" jdbcType="VARCHAR"/>
+        <result column="last_login_time" property="last_login_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM t_admin_user WHERE id = #{id}
+    </delete>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.cms.model.sys.AdminUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_admin_user (username, password,salt, name, status,type,dept_id, mobile, email,last_login_ip)
+        VALUES (#{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+            #{salt,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},#{status,jdbcType=INTEGER},
+            #{type,jdbcType=INTEGER},#{dept_id,jdbcType=BIGINT},#{mobile,jdbcType=VARCHAR},
+            #{email,jdbcType=VARCHAR},#{last_login_ip,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 修改 -->
+    <update id="update" parameterType="com.cms.model.sys.AdminUser">
+        update t_admin_user
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="salt != null">
+                salt = #{salt,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="dept_id != null">
+                dept_id = #{dept_id,jdbcType=BIGINT},
+            </if>
+            <if test="mobile != null">
+                mobile = #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="create_time != null">
+                create_time = #{create_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="last_login_ip != null">
+                last_login_ip = #{last_login_ip,jdbcType=VARCHAR},
+            </if>
+            <if test="last_login_time != null">
+                last_login_time = #{last_login_time,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据用户名获取用户信息 -->
+    <select id="findByUserName" parameterType="java.lang.String" resultType="com.cms.model.sys.AdminUser">
+        SELECT * FROM t_admin_user WHERE username = #{username}
+    </select>
+
+    <!-- 根据用户名获取用户信息 -->
+    <select id="selectUserName" parameterType="java.lang.String" resultType="com.cms.model.sys.AdminUser">
+        SELECT * FROM t_admin_user WHERE username = #{username}
+    </select>
+
+    <!-- 用户名是否存在 -->
+    <select id="hasUserName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT count(0) FROM t_admin_user WHERE username = #{username}
+    </select>
+
+    <!-- 用户名是否存在 -->
+    <select id="hasUserNameByMe" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(0) FROM t_admin_user WHERE username = #{username} and id != #{user_id}
+    </select>
+
+    <!-- 保存用户角色 -->
+    <insert id="saveRole" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_admin_user_role(user_id,role_id) VALUES (#{user_id},#{role_id})
+    </insert>
+
+    <!-- 修改用户角色 -->
+    <update id="updateRole" parameterType="java.util.Map">
+        UPDATE t_admin_user_role set role_id = #{role_id} where user_id = #{user_id}
+    </update>
+
+    <!-- 用户信息 -->
+    <select id="user" parameterType="java.lang.Long" resultType="com.cms.model.sys.AdminUser">
+        SELECT a.*,b.role_id FROM t_admin_user a
+        LEFT JOIN t_admin_user_role b on a.id=b.user_id
+        LEFT JOIN t_admin_role c on b.role_id = c.id
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 用户列表 -->
+    <select id="userList" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminUser">
+        SELECT a.*,c.name AS roleName,d.name AS deptName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime
+        FROM t_admin_user a
+        LEFT JOIN t_admin_user_role b ON a.id=b.user_id
+        LEFT JOIN t_admin_role c ON b.role_id = c.id
+        LEFT JOIN t_dept d ON d.id = a.dept_id
+        WHERE a.id != 1 AND a.type != 2
+        <if test="username != '' and username != null">
+            AND a.username LIKE CONCAT('%','${username}','%' )
+        </if>
+        <if test="status != null and status != 0">
+            and a.status = #{status}
+        </if>
+    </select>
+
+    <!-- 冻结账户 -->
+    <update id="freezeUser" parameterType="java.util.Map">
+        UPDATE t_admin_user SET status = #{status} where id = #{user_id}
+    </update>
+
+    <!-- 用户列表 -->
+    <select id="adminUserCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(0) FROM t_admin_user a
+        LEFT JOIN t_admin_user_role b on a.id=b.user_id
+        LEFT JOIN t_admin_role c on b.role_id = c.id
+        WHERE a.type = 2
+    </select>
+
+    <select id="adminUserList" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminUser">
+        SELECT a.*,c.NAME as roleName
+        FROM t_admin_user a
+        LEFT JOIN t_admin_user_role b on a.id=b.user_id
+        LEFT JOIN t_admin_role c on b.role_id = c.id
+        WHERE a.id != 1 AND a.type = 2
+        <if test="username != '' and username != null">
+            AND a.username LIKE CONCAT('%','${username}','%' )
+        </if>
+        <if test="status != 0">
+            and a.status = #{status}
+        </if>
+        Limit #{index},#{limit}
+    </select>
+
+    <!-- 修改密码 -->
+    <update id="setPassword" parameterType="java.util.Map">
+        UPDATE t_admin_user set password = #{password},salt = #{salt} where id = #{user_id}
+    </update>
+
+    <!-- 查询所有用户 -->
+    <select id="allUsers" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminUser">
+        SELECT a.* FROM t_admin_user a
+        LEFT JOIN t_admin_user_role b ON a.id=b.user_id
+        LEFT JOIN t_admin_role c ON b.role_id = c.id
+        LEFT JOIN t_dept d ON d.id = a.dept_id
+        WHERE a.id != 1
+        <if test="type!= null and type > 1">
+            AND a.type != 1
+        </if>
+        <if test="role_id != null and role_id != 0">
+            and c.id = #{role_id}
+        </if>
+        <if test="user_id != 1">
+            and a.id = #{user_id}
+        </if>
+    </select>
+
+    <!-- 未绑定代理的用户 -->
+    <select id="freeUserList" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminUser">
+        SELECT * FROM t_admin_user a
+        LEFT JOIN t_admin_user_role b ON a.id=b.user_id
+        LEFT JOIN t_admin_role c ON b.role_id = c.id
+        WHERE a.id not in (SELECT agent_id FROM t_book_agent) AND c.id = 105
+    </select>
+</mapper>

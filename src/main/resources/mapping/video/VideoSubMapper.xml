@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.video.VideoSubDao">
+
+    <!-- 是否关注 -->
+    <select id="isFollow" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(0) from t_video_sub where user_id = #{user_id} and `issuer` = #{issuer}
+    </select>
+
+    <!-- 设置关注 -->
+    <insert id="subscribe" parameterType="java.util.Map">
+        insert into t_video_sub (user_id,`issuer`) values (#{user_id},#{issuer})
+    </insert>
+
+    <!-- 用户关注列表 -->
+    <select id="userSubList" parameterType="java.lang.Long" resultType="com.cms.model.video.SubUser">
+        select * from t_video_sub where user_id = #{user_id}
+    </select>
+
+    <!-- 取消关注 -->
+    <delete id="deleSubscribe" parameterType="java.util.Map">
+        delete from t_video_sub where user_id = #{user_id} and `issuer` = #{issuer}
+    </delete>
+
+    <!-- 用户关注 -->
+    <select id="subUserList" parameterType="java.lang.Long" resultType="java.util.Map">
+        select c.id,c.name,c.cover,count(0) as num
+        from t_video_sub a
+        join t_video b on a.issuer = b.issuer
+        join t_video_issuer c on a.issuer = c.id
+        where user_id = #{user_id}
+        group by c.name,c.cover,c.id
+        order by a.create_time desc
+    </select>
+</mapper>

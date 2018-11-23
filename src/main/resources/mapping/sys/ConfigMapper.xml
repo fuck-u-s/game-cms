@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.sys.ConfigDao">
+
+    <!-- 新增参数 -->
+    <insert id="newConfig" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO wz_ad_config(name,val,remark) VALUES (#{name},#{val},#{remark})
+    </insert>
+
+    <!-- 参数列表 -->
+    <select id="configList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM wz_ad_config order by id DESC
+    </select>
+
+    <!-- 查看参数 -->
+    <select id="config" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT * FROM wz_ad_config WHERE id = #{id}
+    </select>
+
+    <!-- 修改参数 -->
+    <update id="updateConfig" parameterType="java.util.Map">
+        UPDATE wz_ad_config set name = #{name},val = #{val},remark = #{remark} where id = #{id}
+    </update>
+
+    <!-- 修改参数值 -->
+    <update id="setVal" parameterType="java.util.Map">
+        UPDATE wz_ad_config SET `val` = #{val} WHERE id = #{id}
+    </update>
+
+    <!-- 获取参数值 -->
+    <select id="getVal" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT val FROM wz_ad_config where id = #{id}
+    </select>
+</mapper>
+
+
+

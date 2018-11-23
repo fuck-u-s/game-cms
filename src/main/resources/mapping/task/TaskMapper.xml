@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.task.TaskDao">
+
+    <!-- 任务列表 -->
+    <select id="taskList" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT *,
+            DATE_FORMAT(uptime,'%Y-%m-%d %H:%i:%S') as lastTime,
+            DATE_FORMAT(createtime,'%Y-%m-%d %H:%i:%S') as cTime
+        FROM t_task
+    </select>
+
+    <!-- 新增任务 -->
+    <insert id="newTask" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_task(name,status) VALUES (#{name},#{status})
+    </insert>
+
+    <!-- 查看任务 -->
+    <select id="taskView" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT * FROM t_task WHERE id = #{id}
+    </select>
+
+    <!-- 修改任务 -->
+    <update id="updateTask" parameterType="java.util.Map">
+        UPDATE t_task SET name = #{name},status = #{status} where id = #{id}
+    </update>
+
+    <!-- 删除任务 -->
+    <update id="deleTask" parameterType="java.lang.Long">
+        UPDATE t_task SET status = 2,type = 2 WHERE id = #{id}
+    </update>
+
+    <!-- 开启/关闭任务 -->
+    <update id="openTask" parameterType="java.util.Map">
+        UPDATE t_task SET status = #{status} where id = #{id}
+    </update>
+</mapper>

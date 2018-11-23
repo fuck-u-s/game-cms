@@ -1,0 +1,41 @@
+label {
+    margin-bottom: 0px;
+}
+
+.fieldset-from {
+    border: 2px dashed rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+}
+
+.legend-fieldset-from {
+    border: 1px dashed #999999;
+    font-size: 18px;
+    width: 100px;
+    color: #999;
+    text-align: center;
+    margin-bottom:0px;
+}
+.layui-layer-btn{
+    background-color: #F8F8F8;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+.l-tab-content-item{
+    overflow: auto;
+}
+
+.form-inline .form-group {
+    padding-right: 10px;
+}
+.ibox-contentList {
+    background-color: #ffffff;
+    color: inherit;
+    padding: 10px;
+    border-color: #ffffff;
+    border-image: none;
+    border-style: solid solid none;
+    border-width: 1px 0;
+}
+.font-normal {
+    font-weight: 400;
+}

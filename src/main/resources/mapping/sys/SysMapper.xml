@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.sys.SysConfigDao">
+
+   <!-- 查看参数是否使用 -->
+    <select id="isUsed" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM t_sys_config WHERE 1=1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="key != null and key != ''">
+            and `key` = #{key}
+        </if>
+    </select>
+
+    <!-- 新增参数 -->
+    <insert id="thisConfig" parameterType="com.cms.model.sys.SysConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_sys_config(name,key,val)VALUES (#{name},#{key},#{val})
+    </insert>
+
+    <!-- 修改参数 -->
+    <update id="setConfig" parameterType="com.cms.model.sys.SysConfig">
+        UPDATE t_sys_config SET
+        <if test="name != null and name != ''">
+            name = #{name}
+        </if>
+        <if test="key != null and key != ''">
+            `key` = #{key}
+        </if>
+        <if test="val != null and val != ''">
+            val = #{val}
+        </if>
+        where id = #{id}
+    </update>
+
+    <!-- 修改参数 -->
+    <update id="setConf" parameterType="com.cms.model.sys.SysConfig">
+        UPDATE t_sys_config SET
+        <if test="name != null and name != ''">
+            name = #{name}
+        </if>
+        <if test="val != null and val != ''">
+            val = #{val}
+        </if>
+        where 1=1
+        <if test="key != null and key != ''">
+            and `key` = #{key}
+        </if>
+    </update>
+
+    <!-- 获取参数 -->
+    <select id="viewConfig" parameterType="java.util.Map" resultType="com.cms.model.sys.SysConfig">
+        SELECT * FROM t_sys_config WHERE 1=1
+        <if test="id != null and id != '' and id != 0">
+            and id = #{id}
+        </if>
+        <if test="key != null and key != ''">
+            and `key` = #{key}
+        </if>
+    </select>
+
+    <!-- 删除参数 -->
+    <delete id="deleConfig" parameterType="java.util.Map">
+        DELETE FROM t_sys_config WHERE 1=1
+        <if test="id != null and id != '' and id != 0">
+            and id = #{id}
+        </if>
+        <if test="key != null and key != ''">
+            and `key` = #{key}
+        </if>
+    </delete>
+</mapper>

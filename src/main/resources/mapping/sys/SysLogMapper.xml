@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.sys.SysLogDao">
+
+    <!-- 插入操作日志 -->
+    <insert id="insert" parameterType="com.cms.model.sys.SysLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_sys_log(user_id,module,methods,description,ip,json,status,areaName,exception,useTime)
+        VALUES (#{user_id},#{module},#{methods},#{description},#{ip},#{json},#{status},#{areaName},#{exception},#{useTime})
+    </insert>
+
+    <!-- 插入登陆日志 -->
+    <insert id="insertLoginLog" parameterType="com.cms.model.sys.LoginLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_login_log(user_id,ip,areaName)
+        VALUES (#{user_id},#{ip},#{areaName})
+    </insert>
+
+    <!-- 操作日志记录 -->
+    <select id="sysLogList" parameterType="java.util.Map" resultType="com.cms.model.sys.SysLog">
+        SELECT a.*,b.name as userName,DATE_FORMAT(a.optime, '%Y-%m-%d %H:%m:%s') op_time
+        FROM t_sys_log a
+        LEFT JOIN t_admin_user b on a.user_id = b.id
+        WHERE 1=1
+        <if test="user_id != 0">
+            and a.user_id = #{user_id}
+        </if>
+        <if test="status != 2">
+            and a.status = #{status}
+        </if>
+        <if test="start_time != null and start_time != ''">
+            and a.optime<![CDATA[ >= ]]>#{start_time}
+        </if>
+        <if test="end_time != null and end_time != ''">
+            and a.optime<![CDATA[ <= ]]>#{end_time}
+        </if>
+        order by a.id DESC
+    </select>
+
+    <!-- 登陆日志 -->
+    <select id="loginLogList" parameterType="java.util.Map" resultType="com.cms.model.sys.LoginLog">
+        SELECT a.*,b.name as userName,DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%m:%s') createTime
+        FROM t_login_log a
+        LEFT JOIN t_admin_user b on a.user_id = b.id
+        WHERE 1=1
+        <if test="user_id != 0">
+            and a.user_id = #{user_id}
+        </if>
+        <if test="start_time != null and start_time != ''">
+            and a.create_time<![CDATA[ >= ]]>#{start_time}
+        </if>
+        <if test="end_time != null and end_time != ''">
+            and a.create_time<![CDATA[ <= ]]>#{end_time}
+        </if>
+        order by a.id DESC
+    </select>
+
+    <!-- 资源报警记录 -->
+    <insert id="serverLog" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_server_log(cpuUsage, setCpuUsage, jvmUsage, setJvmUsage, ramUsage, setRamUsage, email, mark)
+        VALUES (#{cpuUsage},#{setCpuUsage},#{jvmUsage},#{setJvmUsage},#{ramUsage},#{setRamUsage},#{email},#{mark})
+    </insert>
+</mapper>

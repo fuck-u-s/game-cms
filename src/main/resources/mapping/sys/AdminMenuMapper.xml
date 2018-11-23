@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.sys.AdminMenuDao">
+    <resultMap id="BaseResultMap" type="com.cms.model.sys.AdminMenu">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="parent_id" property="parent_id" jdbcType="BIGINT"/>
+        <result column="permission" property="permission" jdbcType="VARCHAR"/>
+        <result column="sort" property="sort" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="url" property="url" jdbcType="VARCHAR"/>
+        <result column="ishide" property="ishide" jdbcType="INTEGER"/>
+        <result column="parent_ids" property="parent_ids" jdbcType="VARCHAR"/>
+        <result column="create_time" property="create_time" jdbcType="TIMESTAMP"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 删除 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM t_admin_menu WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteRoleMenu" parameterType="java.lang.Long">
+        DELETE FROM T_ADMIN_ROLE_MENU where MENU_ID = #{id}
+    </delete>
+
+    <!-- 新增 -->
+    <insert id="insert" parameterType="com.cms.model.sys.AdminMenu" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_admin_menu (name, parent_id,permission, sort, type,url, ishide,icon, parent_ids, description)
+        VALUES (#{name,jdbcType=VARCHAR}, #{parent_id,jdbcType=BIGINT},
+                 #{permission,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER},#{type,jdbcType=INTEGER},
+                 #{url,jdbcType=VARCHAR}, #{ishide,jdbcType=INTEGER},#{icon,jdbcType=VARCHAR},#{parent_ids,jdbcType=VARCHAR},
+                 #{description,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="com.cms.model.sys.AdminMenu">
+        update t_admin_menu
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="parent_id != null">
+                parent_id = #{parent_id,jdbcType=BIGINT},
+            </if>
+            <if test="permission != null">
+                permission = #{permission,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="ishide != null">
+                ishide = #{ishide,jdbcType=INTEGER},
+            </if>
+            <if test="parent_ids != null">
+                parent_ids = #{parent_ids,jdbcType=VARCHAR},
+            </if>
+            <if test="create_time != null">
+                create_time = #{create_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 角色菜单列表 -->
+    <select id="roleMenuList" parameterType="java.lang.Long" resultType="com.cms.model.sys.AdminMenu">
+        SELECT b.* FROM t_admin_role_menu a
+        JOIN t_admin_menu b on a.menu_id=b.id
+        WHERE a.role_id = #{role_id}
+    </select>
+
+    <select id="roleMenuAllList" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT b.id as "id",b.NAME as "name",b.PARENT_ID as "parent_id",b.PERMISSION as "permission",
+        b.SORT as "sort",b.TYPE as "type",b.URL as "url",b.ISHIDE as "ishide",b.ICON as "icon",b.PARENT_IDS as "parent_ids",
+        b.CREATE_TIME as "create_time",b.DESCRIPTION as "description"
+        FROM t_admin_role_menu a JOIN t_admin_menu b on a.menu_id=b.id
+        WHERE a.role_id = #{role_id} and b.type != 3
+        order by b.sort asc
+    </select>
+
+    <select id="userAuthMenuList" parameterType="java.lang.Long" resultType="com.cms.model.sys.AdminMenu">
+        SELECT b.* FROM t_admin_role_menu a JOIN t_admin_menu b on a.menu_id=b.id
+        WHERE a.role_id = #{role_id}
+    </select>
+
+    <!-- 菜单列表 -->
+    <select id="menuList" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminMenu">
+        SELECT * FROM t_admin_menu WHERE parent_id = 0
+    </select>
+
+    <!-- 子菜单列表 -->
+    <select id="childList" parameterType="java.util.Map" resultType="com.cms.model.sys.AdminMenu">
+        SELECT * FROM t_admin_menu WHERE parent_id = #{parent_id}
+    </select>
+
+    <!-- 菜单名是否存在 -->
+    <select id="hasMenuName" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT count(0) FROM t_admin_menu WHERE name = #{name}
+    </select>
+
+    <!-- 所有菜单 -->
+    <select id="authMenuList" resultType="com.cms.model.sys.AdminMenu">
+        SELECT a.* FROM t_admin_menu a WHERE type != 3 order by sort desc
+    </select>
+
+    <!-- 菜单信息 -->
+    <select id="menu" resultType="com.cms.model.sys.AdminMenu">
+        SELECT * FROM t_admin_menu WHERE id = #{id}
+    </select>
+
+    <!-- 新增角色菜单关联 -->
+    <insert id="roleMenu" parameterType="java.util.Map">
+        INSERT INTO t_admin_role_menu(menu_id,role_id) VALUES (#{menu_id},#{role_id})
+    </insert>
+
+    <!-- 菜单列表 -->
+    <select id="allMenuList" resultType="com.cms.model.sys.AdminMenu">
+        SELECT a.* FROM t_admin_menu a
+    </select>
+
+    <!-- 查看最大排序 -->
+    <select id="sort" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(sort),0)+1 AS sort FROM t_admin_menu WHERE parent_id = #{parent_id} ORDER BY id DESC limit 0,1
+    </select>
+</mapper>

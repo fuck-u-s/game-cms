@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.video.VideoProblemDao">
+
+    <!-- 意见列表 -->
+    <select id="problemList" parameterType="java.util.Map" resultType="com.cms.model.video.Problems">
+        select * from t_video_problems
+    </select>
+
+    <!-- 记录意见 -->
+    <insert id="newProblem" parameterType="com.cms.model.video.Problems" useGeneratedKeys="true" keyProperty="id">
+        insert into t_video_problems(user_id, content) VALUES (#{user_id},#{content})
+    </insert>
+
+    <!-- 记录时间 -->
+    <select id="lastProblem" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        select count(0) from t_video_problems where user_id = #{user_id} and DATE_ADD(create_time, INTERVAL 5 MINUTE) > NOW()
+    </select>
+</mapper>

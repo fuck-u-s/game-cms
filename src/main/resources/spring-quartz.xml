@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd"
+	   default-lazy-init="false" default-autowire="byName">
+
+    <!-- Quartz Scheduler 配置作业 -->
+    <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" autowire="no">
+        <property name="triggers">
+            <list>
+                <!--<ref bean="videoTransCodeJob"/>-->
+                <!--<ref bean="syncVideoListJob"/>-->
+            </list>
+        </property>
+    </bean>
+
+    <!-- 系统资源监控时间设置 -->
+    <bean id="emailMsgTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="description"  value="检查系统资源" />
+        <property name="jobDetail" ref="emailMsgTaskJob"></property>
+        <property name="cronExpression" value="0 30 * * * ?" />
+    </bean>
+
+    <!-- 系统资源监控 -->
+    <bean id="emailMsgTaskJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="emailTaskController" />
+        <property name="targetMethod" value="emailTask" />
+    </bean>
+
+    <!-- 视频压缩 -->
+    <bean id="videoTransCodeJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="videoTransCodeTrigger"></property>
+        <property name="cronExpression" value="0 0/10 * * * ?" />
+    </bean>
+
+    <bean id="videoTransCodeTrigger" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="videoTransCodeTask" />
+        <property name="targetMethod" value="videoTransCode" />
+    </bean>
+
+    <!-- 抓取腾讯视频数据 -->
+    <bean id="syncVideoListJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="syncVideoListTrigger"></property>
+        <property name="cronExpression" value="0 0/5 * * * ?" />
+    </bean>
+
+    <bean id="syncVideoListTrigger" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="syncVideoListTask" />
+        <property name="targetMethod" value="syncKuaiBaoList" />
+    </bean>
+
+</beans>

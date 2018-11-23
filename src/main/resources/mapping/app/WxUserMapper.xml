@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cms.dao.app.WxUserDao">
+
+    <!-- 微信用户信息 -->
+    <select id="wxUserInfo" parameterType="java.util.Map" resultType="com.cms.model.app.WxUser">
+        select * from t_app_user where 1 = 1
+        <if test="id != null and id > 0">
+            and id = #{id}
+        </if>
+        <if test="open_id != null">
+            and open_id = #{open_id}
+        </if>
+        <if test="app_id != null">
+            and app_id = #{app_id}
+        </if>
+    </select>
+
+    <!-- 新增微信用户 -->
+    <insert id="saveWxUser" parameterType="com.cms.model.app.WxUser" keyProperty="id" useGeneratedKeys="true">
+        insert into t_app_user (app_id, open_id, nickName, avatarUrl, gender, province, city, country)
+        VALUES (#{app_id}, #{open_id}, #{nickName}, #{avatarUrl}, #{gender}, #{province}, #{city}, #{country})
+        ON DUPLICATE KEY UPDATE nickName = values(nickName), avatarUrl = values(avatarUrl)
+    </insert>
+
+</mapper>
