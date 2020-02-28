@@ -14,8 +14,8 @@ import com.taobao.api.ApiException;
  */
 public class CdnRefreshUtils {
 
-    private static String ACCESS_ID = "n8sq8l6uxSs35Zte";
-    private static String accessKey = "E0GDiXRzZR4S2NGP9Rgky7kAawdQHS";
+    private static String ACCESS_ID = "";
+    private static String accessKey = "";
     private static final String SERVER_URL = "http://cdn.aliyuncs.com";
 
     public CdnRefreshUtils() {
