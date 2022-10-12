@@ -17,7 +17,7 @@
         <!-- spring版本号 -->
         <spring.version>4.3.0.RELEASE</spring.version>
         <!-- shiro版本号-->
-        <shiro.version>1.4.0</shiro.version>
+        <shiro.version>1.10.0</shiro.version>
         <!-- mybatis版本号 -->
         <mybatis.version>3.4.6</mybatis.version>
         <!-- 日志文件管理包版本 -->
